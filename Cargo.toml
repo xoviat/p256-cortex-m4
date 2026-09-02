@@ -19,6 +19,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 der = { version = "0.7.8", features = ["derive"], optional = true }
 ecdsa = { version = "0.16.9", default-features = false, optional = true }
 elliptic-curve = { version = "0.13", default-features = false, features = ["sec1"], optional = true }
+embassy-crypto-driver = { git = "https://github.com/xoviat/embassy", branch = "crypto", optional = true }
 p256-cortex-m4-sys = { path = "sys" }
 rand_core = { version = "0.6", default-features = false }
 sha2 = { version = "0.10", default-features = false, optional = true }
@@ -31,11 +32,12 @@ features = ["arithmetic", "ecdh", "ecdsa", "sha256"]
 optional = true
 
 [features]
-default = ["non-cortex-m4-fallback"]
+default = ["embassy-crypto-driver"]
 traits = ["ecdsa", "elliptic-curve"]
 sec1-signatures = ["der"]
 prehash = ["sha2"]
 non-cortex-m4-fallback = ["ecdsa", "elliptic-curve", "p256"]
+embassy-crypto-driver = ["dep:embassy-crypto-driver"]
 
 [dev-dependencies]
 hex-literal = "0.4.1"

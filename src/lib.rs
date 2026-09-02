@@ -53,3 +53,6 @@ pub use fallback::*;
     cortex_m4,
 ))]
 pub mod traits;
+
+#[cfg(all(feature = "embassy-crypto-driver", cortex_m4))]
+pub mod embassy_crypto;
