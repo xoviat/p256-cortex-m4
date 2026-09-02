@@ -18,8 +18,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 [dependencies]
 der = { version = "0.7.8", features = ["derive"], optional = true }
 ecdsa = { version = "0.16.9", default-features = false, optional = true }
-elliptic-curve = { version = "0.13", default-features = false, optional = true }
-p256-cortex-m4-sys = "0.1.0-alpha.2"
+elliptic-curve = { version = "0.13", default-features = false, features = ["sec1"], optional = true }
+p256-cortex-m4-sys = { path = "sys" }
 rand_core = { version = "0.6", default-features = false }
 sha2 = { version = "0.10", default-features = false, optional = true }
 zeroize = { version = "1.2.0", default-features = false, features = ["zeroize_derive"] }
@@ -32,6 +32,7 @@ optional = true
 
 [features]
 default = ["non-cortex-m4-fallback"]
+traits = ["ecdsa", "elliptic-curve"]
 sec1-signatures = ["der"]
 prehash = ["sha2"]
 non-cortex-m4-fallback = ["ecdsa", "elliptic-curve", "p256"]

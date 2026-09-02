@@ -19,8 +19,6 @@ pub struct Error;
 /// Result type.
 pub type Result<T> = core::result::Result<T, Error>;
 
-// pub mod traits;
-
 /// Convenience function, calculates SHA256 hash digest of a slice of bytes.
 #[cfg(feature = "prehash")]
 #[cfg_attr(docsrs, doc(cfg(feature = "prehash")))]
@@ -41,3 +39,17 @@ pub use cortex_m4::*;
 mod fallback;
 #[cfg(all(feature = "non-cortex-m4-fallback", not(cortex_m4)))]
 pub use fallback::*;
+
+/// Low-level types and traits for generic protocol implementations (TLS, BLE, SPAKE2+).
+///
+/// This module provides `Curve` + `PrimeCurve` implementations for ecosystem compatibility,
+/// plus raw `Scalar` and `ProjectivePoint` types with inherent methods for SPAKE2+.
+///
+/// **Note:** Full `CurveArithmetic` is NOT implemented because the C backend hides
+/// prime-field arithmetic, which the `elliptic-curve` 0.13 trait system requires.
+/// For TLS/BLE operations, use the high-level `SecretKey`/`PublicKey` API instead.
+#[cfg(all(
+    feature = "elliptic-curve",
+    cortex_m4,
+))]
+pub mod traits;
