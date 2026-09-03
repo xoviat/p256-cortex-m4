@@ -32,6 +32,19 @@ void p256_shim_scalar_inv(uint32_t r[8], const uint32_t a[8]);
 /* Validation */
 bool p256_shim_point_is_on_curve(const uint32_t x[8], const uint32_t y[8]);
 
+/* embassy-crypto-driver support (P256Ops unitrait) */
+bool p256_shim_point_from_octets(uint32_t x[8], uint32_t y[8],
+                                 const uint8_t *sec1, uint32_t sec1_len);
+void p256_shim_scalar_inv_vartime(uint32_t r[8], const uint32_t a[8]);
+void p256_shim_scalar_reduce_32bytes(uint32_t r[8], const uint32_t a[8]);
+void p256_shim_projective_negate(uint32_t out[3][8], const uint32_t p[3][8]);
+void p256_shim_projective_add_complete(uint32_t out[3][8],
+                                       const uint32_t a[3][8],
+                                       const uint32_t b[3][8]);
+void p256_shim_projective_sub_complete(uint32_t out[3][8],
+                                       const uint32_t a[3][8],
+                                       const uint32_t b[3][8]);
+
 #ifdef __cplusplus
 }
 #endif
