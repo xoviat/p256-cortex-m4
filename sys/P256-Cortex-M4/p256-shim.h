@@ -44,6 +44,9 @@ void p256_shim_projective_add_complete(uint32_t out[3][8],
 void p256_shim_projective_sub_complete(uint32_t out[3][8],
                                        const uint32_t a[3][8],
                                        const uint32_t b[3][8]);
+void p256_shim_lincomb(uint32_t out[3][8],
+                       const uint32_t k1[8], const uint32_t p1[3][8],
+                       const uint32_t k2[8], const uint32_t p2[3][8]);
 
 #ifdef __cplusplus
 }

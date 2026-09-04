@@ -218,3 +218,62 @@ void p256_shim_projective_sub_complete(uint32_t out[3][8],
     p256_shim_projective_negate(nb, b);
     p256_shim_projective_add_complete(out, a, (const uint32_t (*)[8])nb);
 }
+
+/* ------------------------------------------------------------------ */
+/* Joint double-scalar multiplication: out = k1*p1 + k2*p2            */
+/*                                                                    */
+/* Same sliding-window joint loop as p256_verify: slide_257 recodes   */
+/* both scalars (odd digits -15..15, ~1/5.5 nonzero), and a single    */
+/* 257-iteration pass of doublings + sparse adds accumulates both     */
+/* terms. A zero scalar contributes nothing (all slide digits zero),  */
+/* so the identity is produced only if both are zero. p1/p2 must not  */
+/* be the identity (callers guard, as in p256_verify's key validation).*/
+/* ------------------------------------------------------------------ */
+void p256_shim_lincomb(uint32_t out[3][8],
+                       const uint32_t k1[8], const uint32_t p1[3][8],
+                       const uint32_t k2[8], const uint32_t p2[3][8]) {
+    uint32_t a1x[8], a1y[8], a2x[8], a2y[8];
+    P256_jacobian_to_affine(a1x, a1y, (const uint32_t (*)[8])p1);
+    P256_jacobian_to_affine(a2x, a2y, (const uint32_t (*)[8])p2);
+
+    /* Odd-multiple tables: t[i] = (2i+1) * P, Jacobian. */
+    uint32_t t1[8][3][8], t2[8][3][8];
+    memcpy(t1[0][0], a1x, 32); memcpy(t1[0][1], a1y, 32);
+    memcpy(t1[0][2], one_montgomery, 32);
+    memcpy(t2[0][0], a2x, 32); memcpy(t2[0][1], a2y, 32);
+    memcpy(t2[0][2], one_montgomery, 32);
+
+    uint32_t two1[3][8], two2[3][8];
+    memcpy(two1, t1[0], 96);
+    P256_double_j(two1, (const uint32_t (*)[8])two1);
+    memcpy(two2, t2[0], 96);
+    P256_double_j(two2, (const uint32_t (*)[8])two2);
+
+    for (int i = 1; i < 8; i++) {
+        memcpy(t1[i], two1, 96);
+        P256_add_sub_j(t1[i], (const uint32_t (*)[8])t1[i - 1], false, false);
+        memcpy(t2[i], two2, 96);
+        P256_add_sub_j(t2[i], (const uint32_t (*)[8])t2[i - 1], false, false);
+    }
+
+    signed char s1[257], s2[257];
+    slide_257(s1, (const uint8_t *)k1);
+    slide_257(s2, (const uint8_t *)k2);
+
+    uint32_t cp[3][8] = {0};
+    for (int i = 256; i >= 0; i--) {
+        P256_double_j(cp, (const uint32_t (*)[8])cp);
+        if (s1[i] > 0) {
+            P256_add_sub_j(cp, (const uint32_t (*)[8])t1[s1[i] / 2], false, false);
+        } else if (s1[i] < 0) {
+            P256_add_sub_j(cp, (const uint32_t (*)[8])t1[(-s1[i]) / 2], true, false);
+        }
+        if (s2[i] > 0) {
+            P256_add_sub_j(cp, (const uint32_t (*)[8])t2[s2[i] / 2], false, false);
+        } else if (s2[i] < 0) {
+            P256_add_sub_j(cp, (const uint32_t (*)[8])t2[(-s2[i]) / 2], true, false);
+        }
+    }
+
+    memcpy(out, cp, 96);
+}

@@ -155,7 +155,7 @@ dependencies = [
 [[package]]
 name = "embassy-crypto-driver"
 version = "0.1.0"
-source = "git+https://github.com/xoviat/embassy?branch=crypto#008509505b22e9c8d42a5c62a920fc3a3f90e55c"
+source = "git+https://github.com/xoviat/embassy?branch=crypto#5075a55b0e2d73a1a3aa5f414497b6d3ae2eac46"
 dependencies = [
  "unitrait",
 ]

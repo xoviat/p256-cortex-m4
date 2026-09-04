@@ -395,6 +395,38 @@ impl P256Ops for P256CortexM4 {
         );
         out
     }
+
+    fn projective_lincomb(
+        k1: &Self::Scalar,
+        p1: &Self::ProjectivePoint,
+        k2: &Self::Scalar,
+        p2: &Self::ProjectivePoint,
+    ) -> Self::ProjectivePoint {
+        // Defined fallback for identity operands via the generic path, same
+        // contract as `scalar_mul_projective`. Mirrors `point_from_canonical`:
+        // point validity is public in every intended use (key parsing,
+        // verification), so the branch is not a constant-time concern.
+        // Zero scalars need no guard: the sliding-window loop contributes
+        // nothing for an all-zero recoding, which is exactly `0 * P`.
+        if Self::projective_is_identity(p1) {
+            return Self::scalar_mul_projective(k2, p2);
+        }
+        if Self::projective_is_identity(p2) {
+            return Self::scalar_mul_projective(k1, p1);
+        }
+
+        let mut out = point_from_words([0; 8], [0; 8], [0; 8]);
+        unsafe {
+            p256_cortex_m4_sys::shim::p256_shim_lincomb(
+                out.x.as_mut_ptr(),
+                k1.inner.as_ptr(),
+                &p1.x as *const [u32; 8] as *const u32,
+                k2.inner.as_ptr(),
+                &p2.x as *const [u32; 8] as *const u32,
+            );
+        }
+        out
+    }
 }
 
 // Register this type as the global implementation of the tier-2 P-256 unitrait.

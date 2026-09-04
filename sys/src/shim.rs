@@ -36,4 +36,11 @@ extern "C" {
     pub fn p256_shim_projective_negate(out: *mut u32, p: *const u32);
     pub fn p256_shim_projective_add_complete(out: *mut u32, a: *const u32, b: *const u32);
     pub fn p256_shim_projective_sub_complete(out: *mut u32, a: *const u32, b: *const u32);
+    pub fn p256_shim_lincomb(
+        out: *mut u32,
+        k1: *const u32,
+        p1: *const u32,
+        k2: *const u32,
+        p2: *const u32,
+    );
 }
