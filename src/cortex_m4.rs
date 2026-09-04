@@ -254,9 +254,9 @@ impl PublicKey {
                 bytes.len() as u32,
             )
         } {
-            return Ok(public);
+            Ok(public)
         } else {
-            return Err(Error);
+            Err(Error)
         }
     }
 

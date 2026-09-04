@@ -12,13 +12,13 @@
 
 #![cfg_attr(docsrs, doc(cfg(all(feature = "elliptic-curve", cortex_m4))))]
 
-/// Scalar field element (mod n).
-pub mod scalar;
 /// Affine point (x, y) with SEC1 encoding helpers.
 pub mod affine;
 /// Projective / Jacobian point with raw group operations.
 pub mod projective;
+/// Scalar field element (mod n).
+pub mod scalar;
 
-pub use scalar::Scalar;
 pub use affine::AffinePoint;
 pub use projective::ProjectivePoint;
+pub use scalar::Scalar;

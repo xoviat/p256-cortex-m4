@@ -48,10 +48,7 @@ pub use fallback::*;
 /// **Note:** Full `CurveArithmetic` is NOT implemented because the C backend hides
 /// prime-field arithmetic, which the `elliptic-curve` 0.13 trait system requires.
 /// For TLS/BLE operations, use the high-level `SecretKey`/`PublicKey` API instead.
-#[cfg(all(
-    feature = "elliptic-curve",
-    cortex_m4,
-))]
+#[cfg(all(feature = "elliptic-curve", cortex_m4,))]
 pub mod traits;
 
 #[cfg(all(feature = "embassy-crypto-driver", cortex_m4))]

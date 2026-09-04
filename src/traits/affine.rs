@@ -14,12 +14,12 @@ impl AffinePoint {
     /// The generator point G.
     pub const GENERATOR: Self = AffinePoint {
         x: [
-            0x18905f76, 0xa53755c6, 0x79fb732b, 0x77622510,
-            0x75ba95fc, 0x5fedb601, 0x79e730d4, 0x18a9143c,
+            0x18905f76, 0xa53755c6, 0x79fb732b, 0x77622510, 0x75ba95fc, 0x5fedb601, 0x79e730d4,
+            0x18a9143c,
         ],
         y: [
-            0x8571ff18, 0x25885d85, 0xd2e88688, 0xdd21f325,
-            0x8b4ab8e4, 0xba19e45c, 0xddf25357, 0xce95560a,
+            0x8571ff18, 0x25885d85, 0xd2e88688, 0xdd21f325, 0x8b4ab8e4, 0xba19e45c, 0xddf25357,
+            0xce95560a,
         ],
     };
 

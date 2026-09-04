@@ -6,7 +6,11 @@ use super::AffinePoint;
 ///
 /// Provides raw projective arithmetic for protocols like SPAKE2+.
 #[derive(Clone, Debug)]
-pub struct ProjectivePoint(pub(crate) [u32; 8], pub(crate) [u32; 8], pub(crate) [u32; 8]);
+pub struct ProjectivePoint(
+    pub(crate) [u32; 8],
+    pub(crate) [u32; 8],
+    pub(crate) [u32; 8],
+);
 
 impl ProjectivePoint {
     /// The identity point.

@@ -14,9 +14,7 @@ impl Scalar {
     pub const ZERO: Self = Self([0; 8]);
 
     /// The scalar 1 (in Montgomery representation).
-    pub const ONE: Self = Self([
-        1, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe, 0,
-    ]);
+    pub const ONE: Self = Self([1, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe, 0]);
 
     /// Decode a scalar from a 32-byte big-endian integer.
     ///

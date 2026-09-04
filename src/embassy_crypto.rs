@@ -42,19 +42,28 @@ pub struct ProjectivePoint {
 /// z = 1 in Montgomery form (`one_montgomery` in p256-cortex-m4.c), the
 /// convention this library uses when embedding an affine point into Jacobian
 /// coordinates.
-const ONE_Z: [u32; 8] = [1, 0, 0, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xffff_fffe, 0];
+const ONE_Z: [u32; 8] = [
+    1,
+    0,
+    0,
+    0xffff_ffff,
+    0xffff_ffff,
+    0xffff_ffff,
+    0xffff_fffe,
+    0,
+];
 
 /// SEC secp256r1 base point, canonical big-endian coordinates.
 const GENERATOR: P256AffinePoint = P256AffinePoint {
     x: [
-        0x6b, 0x17, 0xd1, 0xf2, 0xe1, 0x2c, 0x42, 0x47, 0xf8, 0xbc, 0xe6, 0xe5, 0x63, 0xa4,
-        0x40, 0xf2, 0x77, 0x03, 0x7d, 0x81, 0x2d, 0xeb, 0x33, 0xa0, 0xf4, 0xa1, 0x39, 0x45,
-        0xd8, 0x98, 0xc2, 0x96,
+        0x6b, 0x17, 0xd1, 0xf2, 0xe1, 0x2c, 0x42, 0x47, 0xf8, 0xbc, 0xe6, 0xe5, 0x63, 0xa4, 0x40,
+        0xf2, 0x77, 0x03, 0x7d, 0x81, 0x2d, 0xeb, 0x33, 0xa0, 0xf4, 0xa1, 0x39, 0x45, 0xd8, 0x98,
+        0xc2, 0x96,
     ],
     y: [
-        0x4f, 0xe3, 0x42, 0xe2, 0xfe, 0x1a, 0x7f, 0x9b, 0x8e, 0xe7, 0xeb, 0x4a, 0x7c, 0x0f,
-        0x9e, 0x16, 0x2b, 0xce, 0x33, 0x57, 0x6b, 0x31, 0x5e, 0xce, 0xcb, 0xb6, 0x40, 0x68,
-        0x37, 0xbf, 0x51, 0xf5,
+        0x4f, 0xe3, 0x42, 0xe2, 0xfe, 0x1a, 0x7f, 0x9b, 0x8e, 0xe7, 0xeb, 0x4a, 0x7c, 0x0f, 0x9e,
+        0x16, 0x2b, 0xce, 0x33, 0x57, 0x6b, 0x31, 0x5e, 0xce, 0xcb, 0xb6, 0x40, 0x68, 0x37, 0xbf,
+        0x51, 0xf5,
     ],
 };
 
@@ -136,10 +145,6 @@ impl P256Ops for P256CortexM4 {
         P256Scalar(be)
     }
 
-    fn scalar_clone(s: &Self::Scalar) -> Self::Scalar {
-        *s
-    }
-
     fn point_from_canonical(p: &P256AffinePoint) -> Self::ProjectivePoint {
         // Build uncompressed SEC1 point: 0x04 || x || y. The C shim validates
         // (range + on-curve) and converts to Montgomery form on success.
@@ -197,10 +202,6 @@ impl P256Ops for P256CortexM4 {
             x: sec1[1..33].try_into().unwrap(),
             y: sec1[33..65].try_into().unwrap(),
         }
-    }
-
-    fn projective_clone(p: &Self::ProjectivePoint) -> Self::ProjectivePoint {
-        *p
     }
 
     // ------------------------------------------------------------------
@@ -276,12 +277,15 @@ impl P256Ops for P256CortexM4 {
         }
         let mut r = [0u32; 8];
         unsafe {
-            p256_cortex_m4_sys::shim::p256_shim_scalar_inv_vartime(r.as_mut_ptr(), a.inner.as_ptr());
+            p256_cortex_m4_sys::shim::p256_shim_scalar_inv_vartime(
+                r.as_mut_ptr(),
+                a.inner.as_ptr(),
+            );
         }
         scalar_from_words(r)
     }
 
-    fn scalar_reduce_32bytes(bytes: &[u8; 32]) -> Self::Scalar {
+    fn scalar_reduce_bytes(bytes: &[u8; 32]) -> Self::Scalar {
         let mut le = [0u32; 8];
         endian_swap_words(&mut le, bytes);
         let mut r = [0u32; 8];
@@ -316,7 +320,10 @@ impl P256Ops for P256CortexM4 {
         Self::point_from_canonical(&GENERATOR)
     }
 
-    fn projective_add(a: &Self::ProjectivePoint, b: &Self::ProjectivePoint) -> Self::ProjectivePoint {
+    fn projective_add(
+        a: &Self::ProjectivePoint,
+        b: &Self::ProjectivePoint,
+    ) -> Self::ProjectivePoint {
         let mut out = point_from_words([0; 8], [0; 8], [0; 8]);
         unsafe {
             p256_cortex_m4_sys::shim::p256_shim_projective_add_complete(
@@ -328,7 +335,10 @@ impl P256Ops for P256CortexM4 {
         out
     }
 
-    fn projective_sub(a: &Self::ProjectivePoint, b: &Self::ProjectivePoint) -> Self::ProjectivePoint {
+    fn projective_sub(
+        a: &Self::ProjectivePoint,
+        b: &Self::ProjectivePoint,
+    ) -> Self::ProjectivePoint {
         let mut out = point_from_words([0; 8], [0; 8], [0; 8]);
         unsafe {
             p256_cortex_m4_sys::shim::p256_shim_projective_sub_complete(
@@ -367,10 +377,7 @@ impl P256Ops for P256CortexM4 {
         out
     }
 
-    fn scalar_mul_projective(
-        k: &Self::Scalar,
-        p: &Self::ProjectivePoint,
-    ) -> Self::ProjectivePoint {
+    fn scalar_mul_projective(k: &Self::Scalar, p: &Self::ProjectivePoint) -> Self::ProjectivePoint {
         let mut out = point_from_words([0; 8], [0; 8], [0; 8]);
         unsafe {
             p256_cortex_m4_sys::shim::p256_shim_scalar_mul_projective(
